@@ -2,6 +2,8 @@ import pygame
 import random
 import gym
 from gym import spaces
+import stable_baselines3
+from Cell import Cell, Eat
 
 
 pygame.init()
@@ -23,13 +25,7 @@ p_cell = 0.02
 p_food = 0.002 
 
 
-class Cell:
-    def __init__(self):
-        pass
 
-class Eat:
-    def __init__(self):
-        pass
 
 def generate_initial():
     r = random.random()
@@ -86,8 +82,13 @@ class Environment(gym.Env):
     
             if not isinstance(self.matrix[y][x], Cell):
                 continue
+
+            cell = self.matrix[y][x]
+            cell.perceive_environment(self, x, y)
             direction = random.randint(0, 3) 
             new_x, new_y = x, y
+            
+            
             if direction == 0:
                 new_y = y - 1
             elif direction == 1:
@@ -98,7 +99,10 @@ class Environment(gym.Env):
                 new_x = x + 1
             if new_x < 0 or new_x >= self.cols or new_y < 0 or new_y >= self.rows:
                 continue
-           
+            
+        
+
+
             if not isinstance(self.matrix[new_y][new_x], Cell):
                 self.matrix[new_y][new_x] = self.matrix[y][x]
                 self.matrix[y][x] = None

@@ -14,12 +14,16 @@ class Cell():
     __age: int = 0
     __status: Status 
     __hands: list  = [None, None]
+    
+
 
     
     def __init__(self ):
         self.hp = 100
         self.damage = 10
         self.status = Status.LIVE
+        self.reward = 0   
+
     @property
     def age(self):
         return self.__age
@@ -101,8 +105,30 @@ class Cell():
                     self.hungry = self.hungry - self.__hands[temp_count].nutrition
                     eated = True
                     
-            
+    def perceive_environment(self, environment, x, y):
 
+        if self.hp < 50:
+            self.search_for_food(environment, x, y)
+        elif self.hungry < 30:
+            self.search_for_food(environment, x, y)
+        elif self.age > 50:
+            self.status = Status.DEAD
+            print(f"Célula en ({x}, {y}) murió por envejecimiento.")
+    
+    def search_for_food(self, environment, x, y):
+        
+        for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+            new_x, new_y = x + dx, y + dy
+            if 0 <= new_x < environment.cols and 0 <= new_y < environment.rows:
+                if isinstance(environment.matrix[new_y][new_x], Eat):
+                    print(f"Célula en ({x}, {y}) encontró comida en ({new_x}, {new_y}) y la está comiendo.")
+                    self.hungry -=  environment.matrix[new_y][new_x].nutrition
+                    environment.matrix[new_y][new_x] = None  # La comida desaparece
+                    break
+    def move ():
+        ...
+        
+        
 
 class Eat ():
     __nutrition: int 
@@ -116,3 +142,5 @@ class Eat ():
     @nutrition.setter
     def nutrition(self, nutrition):
         self.__nutrition = nutrition
+
+
